@@ -86,6 +86,8 @@ app.get("/temperature/:city", (req, res) => {
         .status(404)
         .type("txt")
         .send("Error: " + city + " temperature data not found");
+    } else if (!checkValidCity(rows)) {
+      sendOopsPage(res, city);
     } else {
       fs.readFile(
         path.join(template, "temperature.html"),
@@ -215,6 +217,8 @@ app.get("/wind/:city", (req, res) => {
         .status(404)
         .type("txt")
         .send("Error: " + city + " wind data not found");
+    } else if (!checkValidCity(rows)) {
+      sendOopsPage(res, city);
     } else {
       fs.readFile(
         path.join(template, "wind.html"),
