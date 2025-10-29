@@ -92,21 +92,44 @@ app.get('/temperature/:city', (req, res) => {
 // Harrison
 app.get('/precipitation/:city', (req, res) => {
     console.log('### city '+req.params.city);
-    let json = null;
-    let mfr = null;
-    let html = null;
+    let sql = 'SELECT year, precipitation, days_with_rain, days_with_snow FROM Weather WHERE city = ?';
+    let city = req.params.city;
 
-
-    fs.readFile(path.join(template, 'precipitation.html'), {encoding: 'utf8'}, (err, data) => {
-        console.log('### read precipitation html');
+    db.all(sql, [city], (err, rows) => {
         if (err) {
-            res.status(404).type('text/plain').send('Error: file not found');
+            res.status(404).type('txt').send('Error: ' + city + ' wind data not found');
         } else {
-            html = data.toString();
-            html = html.replace('$$$ CITY $$$', req.params.city);
-            res.status(200).type('html').send(html);
+            fs.readFile(path.join(template, 'precipitation.html'), {encoding: 'utf8'}, (err, data) => {
+                if (err) {
+                    res.status(404).type('text/plain').send('Error:' + city + ' Wind not found');
+                } else {
+                    console.log('### read precipitation html');  
+
+                    let precipitationTable = '';
+                    for(let i=0; i<rows.length;i++){
+                        precipitationTable += '<tr><td>' + rows[i].year + '</td>';
+                        precipitationTable += '<td>' + rows[i].precipitation + '</td></tr>'; 
+                    }
+                    
+                    //To create graph
+                    const years = JSON.stringify(rows.map(r => r.year));
+                    const precipitation = JSON.stringify(rows.map(r => r.precipitation));
+                    const rain = JSON.stringify(rows.map(r => r.days_with_rain));
+                    const snow = JSON.stringify(rows.map(r => r.days_with_snow));
+
+                    let response = data.replace('$$$CITY$$$', city);
+                    response = response.replace('$$$PRECIPITATION_TABLE$$$', precipitationTable)
+                    response = response.replaceAll('$$$YEARS$$$', years);
+                    response = response.replace('$$$PRECIPITATION$$$', precipitation);
+                    response = response.replace('$$$RAINDAYS$$$', rain);
+                    response = response.replace('$$$SNOWDAYS$$$', snow);
+                    
+                    res.status(200).type('html').send(response);   
+                }
+            })
         }
     });
+
 });
 
 
