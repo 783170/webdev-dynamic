@@ -1,11 +1,115 @@
 <!DOCTYPE html>
 <html>
-<head>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>TEMP</title>
-</head>
-<body>
-	<h1>Historical Temperature in $$$ CITY $$$</h1>
-</body>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MN Weather - Temperature</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="/css/foundation.css" />
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <link rel="icon" type="image/x-icon" href="/images/favicon.png" />
+  </head>
+  <body>
+    <div class="grid-container">
+      <!-- Header -->
+      <div class="grid-x grid-padding-x">
+        <div class="cell small-12 large-6 header">
+          <p>Minnesota Weather</p>
+        </div>
+        <div class="cell small-12 large-6">
+          <div class="grid-x grid-padding-x nav-bar">
+            <div class="cell small-4">
+              <a id="temperatureLink" class="active" onclick="setActiveTab('temperatureDiv')" href="/">Temperature</a>
+            </div>
+            <div class="cell small-4">
+              <a id="precipitationLink" onclick="setActiveTab('precipitationDiv')" href="/">Precipitation</a>
+            </div>
+            <div class="cell small-4">
+              <a id="windLink" onclick="setActiveTab('windDiv')" href="/">Wind</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-x grid-padding-x navigation-links">
+        <div class="cell small-6 text-left">
+          <a href="/temperature/$$$PREV_CITY$$$">&larr; Previous City</a>
+        </div>
+        <div class="cell small-6 text-right">
+          <a href="/temperature/$$$NEXT_CITY$$$">Next City &rarr;</a>
+        </div>
+      </div>
+
+      <!-- Page Content -->
+      <div class="page-content">
+        <div class="grid-x grid-padding-x">
+          <div class="cell small-12">
+            <h1>Historical Temperature in $$$CITY$$$</h1>
+          </div>
+
+          <!-- Table -->
+          <div class="cell small-12 medium-4">
+            <table>
+              <thead>
+                <tr>
+                  <th>Year</th>
+                  <th>Avg. Temperature (°F)</th>
+                  <th>Min. Temperature (°F)</th>
+                  <th>Max. Temperature (°F)</th>
+                </tr>
+              </thead>
+              <tbody>
+                $$$TEMPERATURE_TABLE$$$
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Graph -->
+          <div class="cell small-12 medium-8">
+            <canvas id="temperatureChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const ctx = document.getElementById("temperatureChart").getContext("2d");
+      new Chart(ctx, {
+        type: "line",
+        data: {
+          labels: $$$YEARS$$$,
+          datasets: [
+            {
+              data: $$$AVE$$$,
+              borderColor: "#4c7b89",
+              borderWidth: 2,
+              fill: false,
+            },
+          ],
+        },
+        options: {
+          plugins: {
+            legend: {
+              display: false, // No color legend
+            },
+          },
+          scales: {
+            y: {
+              beginAtZero: false,
+              title: { display: true, text: "Temperature (°F)" },
+            },
+          },
+        },
+      });
+    </script>
+
+    <script src="/js/vendor/jquery.js"></script>
+    <script src="/js/vendor/what-input.js"></script>
+    <script src="/js/vendor/foundation.js"></script>
+    <script type="application/javascript">
+      $(document).foundation();
+    </script>
+    <script type="application/javascript" src="/js/header.js"></script>
+  </body>
 </html>

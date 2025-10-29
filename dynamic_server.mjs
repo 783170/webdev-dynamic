@@ -72,21 +72,56 @@ app.get('/', (req, res) => {
 // Erin
 app.get('/temperature/:city', (req, res) => {
     console.log('### city '+req.params.city);
-    let json = null;
-    let mfr = null;
-    let html = null;
+    let sql = 'SELECT year, avg_temp, temp_max, temp_min FROM Weather WHERE city = ?';
+    let city = req.params.city;
+    let cToF = function(celsius) {
+        if (isNaN(celsius)) 
+            return celsius;
+        else
+            return Math.round((celsius * 1.8 + 32) * 100) / 100;
+    }
 
+    db.all(sql, [city], (err, rows) =>{
+        if(err){
+            res.status(404).type('txt').send('Error: ' + city + ' temperature data not found');
 
-    fs.readFile(path.join(template, 'temperature.html'), {encoding: 'utf8'}, (err, data) => {
-        console.log('### read temp html');
-        if (err) {
-            res.status(404).type('text/plain').send('Error: file not found');
-        } else {
-            html = data.toString();
-            html = html.replace('$$$ CITY $$$', req.params.city);
-            res.status(200).type('html').send(html);
+        } else{
+            fs.readFile(path.join(template, 'temperature.html'), {encoding: 'utf8'}, (err, data) => {
+                if (err) {
+                    res.status(404).type('text/plain').send('Error:' + city + ' Temperature not found');
+                } else {
+
+                    console.log('### read temperature html');
+
+                    let temperatureTable = '';
+                    for(let i=0; i<rows.length;i++){
+                        temperatureTable += '<tr><td>' + rows[i].year + '</td>';
+                        temperatureTable += '<td>' + cToF(rows[i].avg_temp) + '</td>';
+                        temperatureTable += '<td>' + cToF(rows[i].temp_min) + '</td>';
+                        temperatureTable += '<td>' + cToF(rows[i].temp_max) + '</td></tr>'; 
+                    }
+
+                    // To create graph
+                    const years = JSON.stringify(rows.map(r => r.year));
+                    const ave = JSON.stringify(rows.map(r => cToF(r.avg_temp)));
+
+                    let response = data.replace('$$$CITY$$$', city);
+                    response = response.replace('$$$TEMPERATURE_TABLE$$$', temperatureTable);
+                    response = response.replace('$$$YEARS$$$', years);
+                    response = response.replace('$$$AVE$$$', ave);
+
+                    // Previous and Next city links
+                    let index = cities.indexOf(city);
+                    let prevIndex = (index - 1 + cities.length) % cities.length; // wrap around
+                    let nextIndex = (index + 1) % cities.length;
+                    response = response.replace('$$$PREV_CITY$$$', cities[prevIndex]);
+                    response = response.replace('$$$NEXT_CITY$$$', cities[nextIndex]);
+
+                    res.status(200).type('html').send(response);
+                }
+            });
         }
-    });
+    })
 });
 
 // Harrison
@@ -124,6 +159,13 @@ app.get('/precipitation/:city', (req, res) => {
                     response = response.replace('$$$RAINDAYS$$$', rain);
                     response = response.replace('$$$SNOWDAYS$$$', snow);
                     
+                    // Previous and Next city links
+                    let index = cities.indexOf(city);
+                    let prevIndex = (index - 1 + cities.length) % cities.length; // wrap around
+                    let nextIndex = (index + 1) % cities.length;
+                    response = response.replace('$$$PREV_CITY$$$', cities[prevIndex]);
+                    response = response.replace('$$$NEXT_CITY$$$', cities[nextIndex]);
+
                     res.status(200).type('html').send(response);   
                 }
             })
@@ -165,6 +207,13 @@ app.get('/wind/:city', (req, res) => {
                     response = response.replace('$$$WIND_TABLE$$$', windTable);
                     response = response.replace('$$$YEARS$$$', years);
                     response = response.replace('$$$SPEEDS$$$', speeds);
+
+                    // Previous and Next city links
+                    let index = cities.indexOf(city);
+                    let prevIndex = (index - 1 + cities.length) % cities.length; // wrap around
+                    let nextIndex = (index + 1) % cities.length;
+                    response = response.replace('$$$PREV_CITY$$$', cities[prevIndex]);
+                    response = response.replace('$$$NEXT_CITY$$$', cities[nextIndex]);
 
                     res.status(200).type('html').send(response);
                 }

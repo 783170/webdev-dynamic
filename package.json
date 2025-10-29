@@ -3,10 +3,20 @@
     "description": "Dynamic Server",
     "version": "1.0.0",
     "author": {
-        "name": "",
-        "email": ""
+        "name": "Erin De Witt",
+        "email": "dewi7157@stthomas.edu"
     },
-    "contributors": [],
+
+    "contributors": [
+        {
+            "name": "Harrison Amorim",
+            "email": "amor7967@stthomas.edu"
+        },
+        {
+            "name": "Kristina Hildebrandt",
+            "email": "hild7441@stthomas.edu"
+        }
+    ],
     "repository": {},
     "dependencies": {
         "chart.js": "^4.5.1",
