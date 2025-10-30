@@ -41,22 +41,7 @@ const db = new sqlite3.Database(
 app.get("/", (req, res) => {
   console.log("### homepage");
   let index = null;
-
-  let sendResponse = function () {
-    console.log("### sendResponse");
-    let temperatureLinks = "";
-    let precipitationLinks = "";
-    let windLinks = "";
-    for (let i = 0; i < cities.length; i++) {
-      temperatureLinks += `<li><a href="/temperature/${cities[i]}">${cities[i]}</a></li>`;
-      precipitationLinks += `<li><a href="/precipitation/${cities[i]}">${cities[i]}</a></li>`;
-      windLinks += `<li><a href="/wind/${cities[i]}">${cities[i]}</a></li>`;
-    }
-    index = index.replace("$$$ CITIES-TEMPERATURE $$$", temperatureLinks);
-    index = index.replace("$$$ CITIES-PRECIPITATION $$$", precipitationLinks);
-    index = index.replace("$$$ CITIES-WIND $$$", windLinks);
-    res.status(200).type("html").send(index);
-  };
+  let locations;
 
   fs.readFile(path.join(template, "index.html"), (err, data) => {
     console.log("### read index html");
@@ -64,7 +49,35 @@ app.get("/", (req, res) => {
       res.status(404).type("text/plain").send("Error: file not found");
     } else {
       index = data.toString();
-      sendResponse();
+      let temperatureLinks = "";
+      let precipitationLinks = "";
+      let windLinks = "";
+      for (let i = 0; i < cities.length; i++) {
+        temperatureLinks += `<li><a href="/temperature/${cities[i]}">${cities[i]}</a></li>`;
+        precipitationLinks += `<li><a href="/precipitation/${cities[i]}">${cities[i]}</a></li>`;
+        windLinks += `<li><a href="/wind/${cities[i]}">${cities[i]}</a></li>`;
+      }
+      index = index.replace("$$$CITIES-TEMPERATURE$$$", temperatureLinks);
+      index = index.replace("$$$CITIES-PRECIPITATION$$$", precipitationLinks);
+      index = index.replace("$$$CITIES-WIND$$$", windLinks);
+
+
+      db.all("SELECT * FROM Locations", (err, rows) => {
+        if (err) {
+          //res.status(404).type("txt").send("Error: location data not found");
+          console.log(err);
+        } else {
+          locations = rows
+            .map(
+              (r) =>
+                `{ name: "${r.city}", lat: ${r.latitude}, lng: ${r.longitude} }`
+            )
+            .join(",\n");
+          index = index.replace("$$$LOCATIONS$$$", locations);
+          console.log(locations);
+          res.status(200).type("html").send(index);
+        }
+      });
     }
   });
 });
@@ -121,6 +134,10 @@ app.get("/temperature/:city", (req, res) => {
             );
             response = response.replace("$$$YEARS$$$", years);
             response = response.replace("$$$AVE$$$", ave);
+
+            // Image
+            response = response.replace("$$$IMAGE$$$", city);
+            response = response.replace("$$$ALT$$$", city);
 
             // Previous and Next city links
             let index = cities.indexOf(city);

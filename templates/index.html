@@ -37,19 +37,19 @@
             <div id="temperatureDiv" class="cell small-12 medium-6 large-4">
               <h1>Select a city to view historical temperature data:</h1>
               <ul>
-                $$$ CITIES-TEMPERATURE $$$
+                $$$CITIES-TEMPERATURE$$$
               </ul>
             </div>
             <div id="precipitationDiv" class="cell small-12 medium-6 large-4" style="display: none">
               <h1>Select a city to view historical precipitation data:</h1>
               <ul>
-                $$$ CITIES-PRECIPITATION $$$
+                $$$CITIES-PRECIPITATION$$$
               </ul>
             </div>
             <div id="windDiv" class="cell small-12 medium-6 large-4" style="display: none">
               <h1>Select a city to view historical wind data:</h1>
               <ul>
-                $$$ CITIES-WIND $$$
+                $$$CITIES-WIND$$$
               </ul>
             </div>
             <div class="cell small-12 medium-6 large-8">
@@ -60,40 +60,16 @@
 
     <!-- Load Leaflet JS -->
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-    <script>
-      // Define the cities and their coordinates
-      const cities = [
-        { name: "Bemidji", lat: 47.4736, lng: -94.8803 },
-        { name: "Duluth", lat: 46.7867, lng: -92.1005 },
-        { name: "St. Paul", lat: 44.9537, lng: -93.09 },
-      ];
-
-      // Create the map and center roughly on Minnesota
-      const map = L.map("map").setView([46.0, -94.0], 6);
-
-      // Add OpenStreetMap tiles (no API key required)
-      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-        attribution:
-          '&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors',
-      }).addTo(map);
-
-      // Add city markers with popups
-      const bounds = [];
-      cities.forEach((city) => {
-        L.marker([city.lat, city.lng])
-          .addTo(map)
-          .bindPopup(`<b>${city.name}</b>`);
-        bounds.push([city.lat, city.lng]);
-      });
-
-      // Fit map to include all cities
-      map.fitBounds(bounds);
-    </script>
-
-    <!-- include before closing <body> tag -->
     <script src="js/vendor/jquery.js"></script>
     <script src="js/vendor/what-input.js"></script>
     <script src="js/vendor/foundation.js"></script>
     <script type="application/javascript" src="js/header.js"></script>
+    <script type="application/javascript" src="js/map.js"></script>
+    <script>
+  const locations = [
+   $$$LOCATIONS$$$
+  ];
+  displayCitiesOnMap(locations);
+</script>
   </body>
 </html>
