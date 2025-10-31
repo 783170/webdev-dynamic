@@ -214,6 +214,9 @@ app.get("/precipitation/:city", (req, res) => {
             response = response.replace("$$$PREV_CITY$$$", cities[prevIndex]);
             response = response.replace("$$$NEXT_CITY$$$", cities[nextIndex]);
 
+            response = response.replace("$$$IMAGE$$$", city);
+            response = response.replace("$$$ALT$$$", city);
+
             res.status(200).type("html").send(response);
           }
         }
@@ -270,6 +273,9 @@ app.get("/wind/:city", (req, res) => {
             let nextIndex = (index + 1) % cities.length;
             response = response.replace("$$$PREV_CITY$$$", cities[prevIndex]);
             response = response.replace("$$$NEXT_CITY$$$", cities[nextIndex]);
+
+            response = response.replace("$$$IMAGE$$$", city);
+            response = response.replace("$$$ALT$$$", city);
 
             res.status(200).type("html").send(response);
           }
